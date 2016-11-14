@@ -1,8 +1,8 @@
-#### Linux Device Drivers ####
+# Linux Device Drivers #
 
-## Découverte noyau ##
+### Découverte noyau ###
 
-# Syntaxe et signification de la configuration #
+#### Syntaxe et signification de la configuration ####
 
 **D'où proviennent les fichiers `/boot/config-*` ? Dans quels cas sont-ils
 utiles ?**
@@ -20,7 +20,7 @@ Elles peuvent fournir différents types de front-end, reprendre la même
 configuration qu'actuellement mais mise à jour, une configuration avec tout ou
 rien, créer une configuration random, etc.
 
-# Exploration du noyau #
+#### Exploration du noyau ####
 
 **Calculez la taille de chacun des répertoires à la racine. Qu'en
 pensez-vous ?**
@@ -32,7 +32,7 @@ pensez-vous ?**
 138M arch : semble normal pour supporter autant d'architectures.
 35M Documentation : une doc bien fournie \o/
 
-## Premier module ##
+### Premier module ###
 
 **Quels sont les avantages de l'utilisation d'un module plutôt que du code
 compilé en dur directement dans l'image du noyau ?**
@@ -46,14 +46,14 @@ des pilotes pour leurs périphériques.
 De plus, comme le module ne fait pas vraiment partie de Linux, il n'est pas pris
 en compte par la GPLv2 de Linux, ce qui est favorable aux entreprises.
 
-# Votre premier module #
+#### Votre premier module ####
 
 **Pourquoi ne se passe-t-il rien (en apparence) ?**
 
 Où la sortie est-elle dirigée ? Aucune raison que ça soit le stdout de
 l'utilisateur.
 
-# Makefile #
+#### Makefile ####
 
 **Expliquez comment fonctionne le `Makefile` présenté plus haut (i.e. RTFM).**
 `fneq ($(KERNELRELEASE),)`
