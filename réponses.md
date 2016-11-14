@@ -4,7 +4,7 @@
 
 # Syntaxe et signification de la configuration #
 
-**1. D'où proviennent les ficihers `/boot/config-*` ? Dans quels cas sont-ils
+**D'où proviennent les fichiers `/boot/config-*` ? Dans quels cas sont-ils
 utiles ?**
 
 Configuration du kernel installé, générés lors d'un make config. Ilsrenseignent
@@ -12,7 +12,7 @@ sur la configuration actuelle du noyau, ce qui est pratique lorsque l'on compile
 à nouveau le noyau pour la même machine : il suffit de copier cette
 configuration.
 
-**3. Existe-t-il d'autres cibles du `Makefile`  ayant un impact sur la
+**Existe-t-il d'autres cibles du `Makefile`  ayant un impact sur la
 configuration ? Si oui lesquelles et à quoi peuvent-elles servir ?**
 
 Oui, plein, la majorité de ce qui sort sur un `make help | grep config`.
@@ -22,7 +22,7 @@ rien, créer une configuration random, etc.
 
 # Exploration du noyau #
 
-**3. Calculez la taille de chacun des répertoires à la racine. Qu'en
+**Calculez la taille de chacun des répertoires à la racine. Qu'en
 pensez-vous ?**
 
 3.1G de kernel, ça fait beaucoup de sources, doc, etc
@@ -31,5 +31,12 @@ pensez-vous ?**
 395M drivers : beaucoup, beaucoup de drivers. Dommage d'en embarquer autant.
 138M arch : semble normal pour supporter autant d'architectures.
 35M Documentation : une doc bien fournie \o/
+
+# Votre premier module #
+
+**Pourquoi ne se passe-t-il rien (en apparence) ?**
+
+Où la sortie est-elle dirigée ? Aucune raison que ça soit le stdout de
+l'utilisateur.
 
 
