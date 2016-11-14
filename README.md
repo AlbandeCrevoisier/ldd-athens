@@ -1,3 +1,7 @@
-# My new project
+#### Athens week: Linux Device Drivers ####
 
-This is the default README.md. Please edit me.
+This is my repository during the LDD Athens week at Telecom ParisTech with
+Guillaume Duc.
+
+Alban de Crevoisier d'Hurbache
+
