@@ -32,6 +32,14 @@ pensez-vous ?**
 138M arch : semble normal pour supporter autant d'architectures.
 35M Documentation : une doc bien fournie \o/
 
+## Premier module ##
+
+**Quels sont les avantages de l'utilisation d'un module plutôt que du code
+compilé en dur directement dans l'image du noyau ?**
+
+On gagne en souplesse, puisqu'on peut charger et décharger les modules quand on
+le souhaite.
+
 # Votre premier module #
 
 **Pourquoi ne se passe-t-il rien (en apparence) ?**
