@@ -5,18 +5,21 @@
  * Licensed under the GPLv2
  */
 
+#include <linux/init.h>
 #include <linux/module.h>
 #include <linux/i2c.h>
+#include <linux/kernel.h>
 
 static struct i2c_device_id adxl345_idtable[] = {
-	{"adxl345", 0}
+	{"adxl345", (kernel_ulong_t) 0},
+	{}
 };
 
 MODULE_DEVICE_TABLE(i2c, adxl345_idtable);
 
 #ifdef CONFIG_OF
 static const struct of_device_id adxl345_of_match[] = {
-	{.compatible = "vendor, adxl345", },
+	{.compatible = "ad, adxl345", },
 	{}
 };
 
@@ -26,12 +29,14 @@ MODULE_DEVICE_TABLE(of, adxl345_of_match);
 
 static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 {
-	/* TODO */
+	pr_info("ADXL345 probe\n");
+	return 0;
 }
 
 static int adxl345_remove(struct i2c_client *c)
 {
 	/* TODO */
+	return 0;
 }
 
 static struct i2c_driver adxl345_driver = {
