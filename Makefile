@@ -1,6 +1,6 @@
 ifneq ($(KERNELRELEASE),)
 # kbuild part of makefile
-obj-m  := first.o
+obj-m  := first.o first_params.o
 
 else
 # normal makefile

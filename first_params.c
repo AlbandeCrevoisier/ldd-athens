@@ -4,12 +4,15 @@
 #include <linux/kernel.h>
 
 static char *message = "Hello world!";
+static int nb = 0;
+
 module_param(message, charp, S_IRUGO);
-MODULE_PARM_DESC(message, "The message to print");
+module_param(nb, int, S_IRUGO);
+MODULE_PARM_DESC(message, "The message and number to print");
 
 static int __init first_init(void)
 {
-	pr_info("%s\n", message);
+	pr_info("%s %d\n", message, nb);
 	return 0;
 }
 

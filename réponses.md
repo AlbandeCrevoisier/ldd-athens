@@ -54,7 +54,7 @@ en compte par la GPLv2 de Linux, ce qui est favorable aux entreprises.
 **Pourquoi ne se passe-t-il rien (en apparence) ?**
 
 Où la sortie est-elle dirigée ? Aucune raison que ça soit le stdout de
-l'utilisateur.
+l'utilisateur. On peut lire les messages avec dmesg.
 
 #### Makefile ####
 
