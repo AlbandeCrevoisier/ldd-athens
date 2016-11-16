@@ -19,7 +19,7 @@ MODULE_DEVICE_TABLE(i2c, adxl345_idtable);
 
 #ifdef CONFIG_OF
 static const struct of_device_id adxl345_of_match[] = {
-	{.compatible = "ad, adxl345", },
+	{.compatible = "ad,adxl345", },
 	{}
 };
 
