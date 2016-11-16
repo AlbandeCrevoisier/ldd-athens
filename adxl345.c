@@ -29,15 +29,29 @@ MODULE_DEVICE_TABLE(of, adxl345_of_match);
 
 static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 {
-	char addr = 0x00;
+	char devid = 0x00;
 	char buf = 0;
+	char bw_rate_addr = 0x2C;
+	char bw_rate[2] = {0x2C, 0x0A}; /* 100 Hz */
+	char int_enable[2] = {0x2E, 0x00}; /* disable all interrupts */
+	char data_format[2] = {0x31, 0x03 | 0x08}; /* full res, 16g */
 
 	dev_info(&(c->dev), "ADXL345 probe\n");
 
 	/* read DEVID */
-	i2c_master_send(c, &addr, (int) 1);
-	i2c_master_recv(c, &buf, (int) 1);
+	i2c_master_send(c, &devid, 1);
+	i2c_master_recv(c, &buf, 1);
 	dev_info(&(c->dev), "DEVID: %02x\n", buf);
+
+	/* Configuration for the accelerometer */
+	i2c_master_send(c, bw_rate, 2);
+	i2c_master_send(c, int_enable, 2);
+	i2c_master_send(c, data_format, 2);
+
+	/* Check bw_rate */
+	i2c_master_send(c, &bw_rate_addr, 1);
+	i2c_master_recv(c, &buf, 1);
+	dev_info(&(c->dev), "BW_RATE: %02x\n", buf);
 
 	return 0;
 }
