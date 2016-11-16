@@ -31,10 +31,9 @@ static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 {
 	char devid = 0x00;
 	char buf = 0;
-	char data_format_addr = 0x31;
 	char bw_rate[2] = {0x2C, 0x0A};		/* disable low power, 100 Hz */
 	char int_enable[2] = {0x2E, 0x00};	/* disable all interrupts */
-	char data_format[2] = {0x31, 0x03 | 0x08}; /* full res, 16g */
+	char data_format[2] = {0x31, 0x03 | 0x08}; /* 16g, full resolution */
 	char fifo_ctl[2] = {0x38, 0x00};	/* bypass */
 	char power_ctl[2] = {0x2D, 0x8};	/* measure mode */
 
@@ -52,17 +51,22 @@ static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 	i2c_master_send(c, fifo_ctl, 2);
 	i2c_master_send(c, power_ctl, 2);
 
-	/* Check data_format */
-	i2c_master_send(c, &data_format_addr, 1);
-	i2c_master_recv(c, &buf, 1);
-	dev_info(&(c->dev), "DATA_FORMAT: %02x\n", buf);
-
 	return 0;
 }
 
 static int adxl345_remove(struct i2c_client *c)
 {
-	/* TODO */
+	char power_ctl_addr = 0;
+	char power_ctl[2] = {power_ctl_addr, 0};
+
+	dev_info(&(c->dev), "ADXL345 remove\n");
+
+	/* standby mode */
+	i2c_master_send(c, &power_ctl_addr, 1);
+	i2c_master_recv(c, &power_ctl[1], 1);
+	power_ctl[1] &= 0x08;
+	i2c_master_send(c, power_ctl, 1);
+
 	return 0;
 }
 
