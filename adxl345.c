@@ -7,8 +7,8 @@
 
 #include <linux/init.h>
 #include <linux/module.h>
+#include <linux/device.h>
 #include <linux/i2c.h>
-#include <linux/kernel.h>
 
 static struct i2c_device_id adxl345_idtable[] = {
 	{"adxl345", (kernel_ulong_t) 0},
@@ -29,7 +29,16 @@ MODULE_DEVICE_TABLE(of, adxl345_of_match);
 
 static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 {
-	pr_info("ADXL345 probe\n");
+	char addr = 0x00;
+	char buf = 0;
+
+	dev_info(&(c->dev), "ADXL345 probe\n");
+
+	/* read DEVID */
+	i2c_master_send(c, &addr, (int) 1);
+	i2c_master_recv(c, &buf, (int) 1);
+	dev_info(&(c->dev), "DEVID: %02x\n", buf);
+
 	return 0;
 }
 
