@@ -5,6 +5,7 @@
  * Licensed under the GPLv2
  */
 
+#include <linux/errno.h>
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/device.h>
@@ -41,8 +42,18 @@ static struct i2c_driver adxl345_driver = {
 
 module_i2c_driver(adxl345_driver);
 
+static const struct file_operations adxl345_fops = {
+};
+
+static struct miscdevice adxl345_dev = {
+	.minor = MISC_DYNAMIC_MINOR,
+	.name = "adxl345",
+	.fops = &adxl345_fops
+};
+
 static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 {
+	int ret = 0;
 	char devid = 0x00;
 	char buf = 0;
 	char bw_rate[2] = {0x2C, 0x0A};		/* disable low power, 100 Hz */
@@ -65,11 +76,17 @@ static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 	i2c_master_send(c, fifo_ctl, 2);
 	i2c_master_send(c, power_ctl, 2);
 
+	/* register to misc framework */
+	int = misc_register(adxl345_dev);
+	if (!int)
+		return EINVAL;
+
 	return 0;
 }
 
 static int adxl345_remove(struct i2c_client *c)
 {
+	int ret = 0;
 	char power_ctl_addr = 0;
 	char power_ctl[2] = {power_ctl_addr, 0};
 
@@ -78,8 +95,13 @@ static int adxl345_remove(struct i2c_client *c)
 	/* standby mode */
 	i2c_master_send(c, &power_ctl_addr, 1);
 	i2c_master_recv(c, &power_ctl[1], 1);
-	power_ctl[1] &= (~0x08);
+	power_ctl[1] &= (~t0x08);
 	i2c_master_send(c, power_ctl, 1);
+
+	/* unregister from misc framework */
+	int = misc_unregister(adxl345_dev);
+	if (!int)
+		return EINVAL;
 
 	return 0;
 }
