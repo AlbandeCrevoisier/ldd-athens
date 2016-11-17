@@ -4,6 +4,7 @@ obj-m  := first.o first_params.o adxl345.o
 
 else
 # normal makefile
+
 KDIR ?= /lib/modules/`uname -r`/build
 
 default:
