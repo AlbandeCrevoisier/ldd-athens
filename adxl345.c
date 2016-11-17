@@ -8,7 +8,11 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/device.h>
+#include <linux/miscdevice.h>
 #include <linux/i2c.h>
+
+static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id);
+static int adxl345_remove(struct i2c_client *c);
 
 static struct i2c_device_id adxl345_idtable[] = {
 	{"adxl345", (kernel_ulong_t) 0},
@@ -23,9 +27,19 @@ static const struct of_device_id adxl345_of_match[] = {
 	{}
 };
 
-
 MODULE_DEVICE_TABLE(of, adxl345_of_match);
 #endif /* CONFIG_OF */
+static struct i2c_driver adxl345_driver = {
+	.driver = {
+		.name = "adxl345",
+		.of_match_table = of_match_ptr(adxl345_of_match)
+	},
+	.id_table = adxl345_idtable,
+	.probe = adxl345_probe,
+	.remove = adxl345_remove
+};
+
+module_i2c_driver(adxl345_driver);
 
 static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 {
@@ -64,23 +78,11 @@ static int adxl345_remove(struct i2c_client *c)
 	/* standby mode */
 	i2c_master_send(c, &power_ctl_addr, 1);
 	i2c_master_recv(c, &power_ctl[1], 1);
-	power_ctl[1] &= 0x08;
+	power_ctl[1] &= (~0x08);
 	i2c_master_send(c, power_ctl, 1);
 
 	return 0;
 }
-
-static struct i2c_driver adxl345_driver = {
-	.driver = {
-		.name		= "adxl345",
-		.of_match_table	= of_match_ptr(adxl345_of_match)
-	},
-	.id_table	= adxl345_idtable,
-	.probe		= adxl345_probe,
-	.remove		= adxl345_remove
-};
-
-module_i2c_driver(adxl345_driver);
 
 MODULE_LICENSE("GPL");
 MODULE_DESCRIPTION("ADXL345 I2C Driver");
