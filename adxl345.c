@@ -96,9 +96,9 @@ static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 	adxl345_dev->misc_dev.fops = &adxl345_fops;
 	adxl345_dev->misc_dev.parent = &c->dev;
 	ret = misc_register(&adxl345_dev->misc_dev);
-	if (!ret) {
+	if (ret) {
 		dev_err(&c->dev, "misc_register failed\n");
-		return -EINVAL;
+		return ret;
 	}
 	i2c_set_clientdata(c, adxl345_dev);
 
