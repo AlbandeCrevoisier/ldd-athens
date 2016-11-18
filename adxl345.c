@@ -16,9 +16,9 @@
 
 static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id);
 static int adxl345_remove(struct i2c_client *c);
-static ssize_t adxl345_read(struct file *f, char __user *buf, size_t count,
+static ssize_t adxl345_read(struct file *fp, char __user *buf, size_t count,
 	loff_t *f_pos);
-static long adxl345_unlocked_ioctl(struct file *f, unsigned int cmd,
+static long adxl345_unlocked_ioctl(struct file *fp, unsigned int cmd,
 	unsigned long arg);
 
 static struct i2c_device_id adxl345_idtable[] = {
@@ -56,7 +56,7 @@ static const struct file_operations adxl345_fops = {
 
 struct adxl345_device {
 	struct miscdevice misc_dev;
-	char data_addr;
+	uint8_t data_addr;
 };
 
 static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
@@ -64,13 +64,13 @@ static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 	int ret = 0;
 	struct adxl345_device *adxl345_dev;
 
-	char devid = 0x00;
-	char buf = 0;
-	char bw_rate[2] = {0x2C, 0x0A};		/* disable low power, 100 Hz */
-	char int_enable[2] = {0x2E, 0x00};	/* disable all interrupts */
-	char data_format[2] = {0x31, 0x03 | 0x08}; /* 16g, full resolution */
-	char fifo_ctl[2] = {0x38, 0x00};	/* bypass */
-	char power_ctl[2] = {0x2D, 0x8};	/* measure mode */
+	uint8_t devid = 0x00;
+	uint8_t buf = 0;
+	uint8_t bw_rate[2] = {0x2C, 0x0A};	/* disable low power, 100 Hz */
+	uint8_t int_enable[2] = {0x2E, 0x00};	/* disable all interrupts */
+	uint8_t data_format[2] = {0x31, 0x03 | 0x08}; /* 16g, full resolution */
+	uint8_t fifo_ctl[2] = {0x38, 0x00};	/* bypass */
+	uint8_t power_ctl[2] = {0x2D, 0x8};	/* measure mode */
 
 	dev_info(&c->dev, "ADXL345 probe\n");
 
@@ -111,8 +111,8 @@ static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 static int adxl345_remove(struct i2c_client *c)
 {
 	struct adxl345_device *adxl345_dev;
-	char power_ctl_addr = 0;
-	char power_ctl[2] = {power_ctl_addr, 0};
+	uint8_t power_ctl_addr = 0;
+	uint8_t power_ctl[2] = {power_ctl_addr, 0};
 
 	dev_info(&c->dev, "ADXL345 remove\n");
 
@@ -129,7 +129,7 @@ static int adxl345_remove(struct i2c_client *c)
 	return 0;
 }
 
-static ssize_t adxl345_read(struct file *f, char __user *buf, size_t count,
+static ssize_t adxl345_read(struct file *fp, char __user *buf, size_t count,
 	loff_t *f_pos)
 {
 	int ret = 0;
@@ -140,9 +140,9 @@ static ssize_t adxl345_read(struct file *f, char __user *buf, size_t count,
 	struct adxl345_device *adxl345_dev;
 	struct miscdevice *misc_dev;
 
-	int8_t data_buf[2] = {0};
+	int8_t data_buf[2];
 
-	misc_dev = f->private_data;
+	misc_dev = fp->private_data;
 	adxl345_dev = container_of(
 		misc_dev, struct adxl345_device, misc_dev);
 	dev = misc_dev->parent;
@@ -154,20 +154,24 @@ static ssize_t adxl345_read(struct file *f, char __user *buf, size_t count,
 	ret = put_user(data_buf[0], tmp);
 	if (ret)
 		return ret;
-	ret = put_user(data_buf[1], tmp);
+
+	if (count == 1)
+		return 1;
+
+	ret = put_user(data_buf[1], tmp + 1);
 	if (ret)
 		return ret;
 
-	return 0;
+	return 2;
 }
 
-static long adxl345_unlocked_ioctl(struct file *f, unsigned int cmd,
+static long adxl345_unlocked_ioctl(struct file *fp, unsigned int cmd,
 	unsigned long arg)
 {
 	struct adxl345_device *adxl345_dev;
 	struct miscdevice *misc_dev;
 
-	misc_dev = f->private_data;
+	misc_dev = fp->private_data;
 	adxl345_dev = container_of(
 		misc_dev, struct adxl345_device, misc_dev);
 
