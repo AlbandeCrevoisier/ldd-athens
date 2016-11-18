@@ -186,9 +186,12 @@ static long adxl345_unlocked_ioctl(struct file *fp, unsigned int cmd,
 		adxl345_dev->data_addr = 0x34;
 		break;
 	case 'z':
-		adxl345_dev->data_addr = 0x32;
+		adxl345_dev->data_addr = 0x36;
 		break;
+	default:
+		return -EINVAL;
 	}
+
 	return 0;
 }
 
