@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2016, Alban de Crevoisier d'Hurbache
  *
- * Licensed under the GPLv2
+ * Licensed under the 3-clause BSD License
  */
 
 #include <linux/errno.h>
@@ -12,6 +12,7 @@
 #include <linux/miscdevice.h>
 #include <linux/i2c.h>
 #include <linux/fs.h>
+#include <asm/uaccess.h>
 
 static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id);
 static int adxl345_remove(struct i2c_client *c);
@@ -55,6 +56,7 @@ static const struct file_operations adxl345_fops = {
 
 struct adxl345_device {
 	struct miscdevice misc_dev;
+	char data_addr;
 };
 
 static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
@@ -95,6 +97,7 @@ static int adxl345_probe(struct i2c_client *c, const struct i2c_device_id *id)
 	adxl345_dev->misc_dev.name = "adxl345";
 	adxl345_dev->misc_dev.fops = &adxl345_fops;
 	adxl345_dev->misc_dev.parent = &c->dev;
+	adxl345_dev->data_addr = 0x32;			/* DATAX0 by default */
 	ret = misc_register(&adxl345_dev->misc_dev);
 	if (ret) {
 		dev_err(&c->dev, "misc_register failed\n");
@@ -129,15 +132,62 @@ static int adxl345_remove(struct i2c_client *c)
 static ssize_t adxl345_read(struct file *f, char __user *buf, size_t count,
 	loff_t *f_pos)
 {
+	int ret = 0;
+	char __user *tmp = buf;
+
+	struct i2c_client *c;
+	struct device *dev;
+	struct adxl345_device *adxl345_dev;
+	struct miscdevice *misc_dev;
+
+	int8_t data_buf[2] = {0};
+
+	misc_dev = f->private_data;
+	adxl345_dev = container_of(
+		misc_dev, struct adxl345_device, misc_dev);
+	dev = misc_dev->parent;
+	c = to_i2c_client(dev);
+
+	i2c_master_send(c, &adxl345_dev->data_addr, 1);
+	i2c_master_recv(c, data_buf, 2);
+
+	ret = put_user(data_buf[0], tmp);
+	if (ret)
+		return ret;
+	ret = put_user(data_buf[1], tmp);
+	if (ret)
+		return ret;
+
 	return 0;
 }
 
 static long adxl345_unlocked_ioctl(struct file *f, unsigned int cmd,
 	unsigned long arg)
 {
+	struct adxl345_device *adxl345_dev;
+	struct miscdevice *misc_dev;
+
+	misc_dev = f->private_data;
+	adxl345_dev = container_of(
+		misc_dev, struct adxl345_device, misc_dev);
+
+	if (cmd != 4242)
+		return -EINVAL;
+	/* select the axis */
+	switch(arg) {
+	case 'x':
+		adxl345_dev->data_addr = 0x32;
+		break;
+	case 'y':
+		adxl345_dev->data_addr = 0x34;
+		break;
+	case 'z':
+		adxl345_dev->data_addr = 0x32;
+		break;
+	}
 	return 0;
 }
 
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("Dual BSD/GPL");
 MODULE_DESCRIPTION("ADXL345 I2C Driver");
 MODULE_AUTHOR("ach");
